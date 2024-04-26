@@ -1015,7 +1015,25 @@ require('lazy').setup({
       'nvim-tree/nvim-web-devicons',
     },
     config = function()
-      require('nvim-tree').setup {}
+      local function my_on_attach(bufnr)
+        local api = require 'nvim-tree.api'
+
+        local function opts(desc)
+          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        -- default mappings
+        api.config.mappings.default_on_attach(bufnr)
+
+        -- custom mappings
+        vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent, opts 'Up')
+        vim.keymap.set('n', '?', api.tree.toggle_help, opts 'Help')
+      end
+      require('nvim-tree').setup {
+        ---
+        on_attach = my_on_attach,
+        ---
+      }
     end,
   },
   {
@@ -1092,7 +1110,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
