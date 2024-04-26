@@ -930,11 +930,14 @@ require('lazy').setup({
 
   -- Golang LazyVim Extras
   {
+    'mfussenegger/nvim-dap',
+  },
+  {
     'leoluz/nvim-dap-go',
     config = true,
   },
   {
-    'nvim-neotest/neotest-go',
+    'nvim-neotest/neotest',
     optional = true,
     dependencies = {
       'nvim-neotest/neotest-go',
@@ -980,6 +983,9 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'kyoh86/vim-go-coverage',
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -1024,6 +1030,36 @@ require('lazy').setup({
     },
   },
 })
+
+-- Keymaps
+--
+
+vim.keymap.set('n', '<C-n>', ':cnext<CR>', { desc = 'Next error' })
+vim.keymap.set('n', '<C-m>', ':cprevious<CR>', { desc = 'Prev error' })
+
+-- Define the <leader>b mapping to invoke go-build
+vim.api.nvim_set_keymap('n', '<leader>b', ':GoBuild<CR>', { noremap = true, silent = true })
+-- Define the <leader>r mapping to invoke go-run
+
+-- run :GoBuild or :GoTestCompile based on the go file
+function Build_go_files()
+  -- Get the current file name
+  local file = vim.fn.expand '%'
+
+  -- Check if the file is a test file
+  if string.match(file, '.*_test%.go$') then
+    -- If it's a test file, run :GoTestCompile
+    vim.cmd 'GoTestCompile'
+    -- If it's a regular Go file
+  elseif string.match(file, '.*%.go$') then
+    -- Run :GoBuild
+    vim.cmd 'GoBuild'
+  end
+end
+
+vim.api.nvim_set_keymap('n', '<leader>r', ':call Build_go_files<CR>', { noremap = true, silent = true })
+-- Define the <leader>r mapping to invoke go-run
+--vim.api.nvim_set_keymap('n', '<leader>t', ':GoTest<CR>', { noremap = true, silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
